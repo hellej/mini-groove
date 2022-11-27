@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - master
+    tags:
+      - v0.**
   pull_request:
   workflow_dispatch:
 
@@ -72,8 +73,8 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/')"
-    needs: [ cargo_test, macos, windows, linux ]
+    # if: "startsWith(github.ref, 'refs/tags/')"
+    # needs: [ cargo_test, macos, windows, linux ]
     steps:
       - uses: actions/download-artifact@v3
         with:
@@ -81,7 +82,8 @@ jobs:
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
-          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          MATURIN_USERNAME: __token__
+          MATURIN_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         with:
           command: upload
           args: --skip-existing *
