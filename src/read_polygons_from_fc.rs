@@ -3,8 +3,8 @@ use geojson::{FeatureCollection, GeoJson, Value};
 
 fn collect_polygons_from_fc(fc: &FeatureCollection) -> Vec<Polygon> {
     let mut v: Vec<Polygon<f64>> = Vec::new();
-    for feat in &fc.features {
-        if let Some(ref geom) = feat.geometry {
+    fc.features.iter().for_each(|f| {
+        if let Some(ref geom) = f.geometry {
             match geom.value {
                 Value::Polygon(_) => {
                     v.push(Polygon::try_from(geom).expect("Unable to read Polygon"))
@@ -17,7 +17,7 @@ fn collect_polygons_from_fc(fc: &FeatureCollection) -> Vec<Polygon> {
                 _ => (),
             }
         }
-    }
+    });
     v
 }
 
