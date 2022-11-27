@@ -73,7 +73,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    # if: "startsWith(github.ref, 'refs/tags/')"
+    if: "startsWith(github.ref, 'refs/tags/')"
     needs: [ cargo_test, macos, windows, linux ]
     steps:
       - uses: actions/download-artifact@v3
@@ -82,8 +82,7 @@ jobs:
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
-          MATURIN_USERNAME: __token__
-          MATURIN_PASSWORD: ${{ secrets.MATURIN_PYPI_TOKEN }}
+          MATURIN_PYPI_TOKEN: ${{ secrets.MATURIN_PYPI_TOKEN }}
         with:
           command: upload
           args: --skip-existing *
