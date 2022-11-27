@@ -83,7 +83,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         env:
           MATURIN_USERNAME: __token__
-          MATURIN_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+          MATURIN_PASSWORD: ${{ secrets.MATURIN_PYPI_TOKEN }}
         with:
           command: upload
           args: --skip-existing *
