@@ -7,12 +7,14 @@ mod read_polygons_from_fc;
 mod read_polygons_from_wkt;
 mod smooth_simplify_polygons;
 
-pub fn smooth_and_simplify_polygons_from_wkts_impl(
+fn smooth_and_simplify_polygons_from_wkts_impl(
     wkts: &[&str],
+    smoothing_iterations: usize,
     simplify_tolerance_m: &f64,
 ) -> Vec<String> {
     smooth_simplify_polygons::smooth_simplify_polygons(
         read_polygons_from_wkt::read_polygons_from_wkts(wkts),
+        smoothing_iterations,
         simplify_tolerance_m,
     )
     .iter()
@@ -23,30 +25,41 @@ pub fn smooth_and_simplify_polygons_from_wkts_impl(
 #[pyfunction]
 fn smooth_and_simplify_polygons_from_wkts(
     polygon_wkts: Vec<&str>,
+    smoothing_iterations: usize,
     simplify_tolerance_m: f64,
 ) -> PyResult<Vec<String>> {
     Ok(smooth_and_simplify_polygons_from_wkts_impl(
         &polygon_wkts,
+        smoothing_iterations,
         &simplify_tolerance_m,
     ))
 }
 
-pub fn smooth_and_simplify_polygon_fc_impl(
+fn smooth_and_simplify_polygon_fc_impl(
     geojson: &str,
+    smoothing_iterations: usize,
     simplify_tolerance_m: &f64,
 ) -> FeatureCollection {
     make_fc_from_polygons::make_fc_from_polygons(
         smooth_simplify_polygons::smooth_simplify_polygons(
             read_polygons_from_fc::read_polygons_from_feature_collection(geojson)
                 .expect("Empty or invalid GeoJSON"),
+            smoothing_iterations,
             simplify_tolerance_m,
         ),
     )
 }
 
 #[pyfunction]
-fn smooth_and_simplify_polygon_fc(geojson: &str, simplify_tolerance_m: f64) -> PyResult<String> {
-    Ok(smooth_and_simplify_polygon_fc_impl(geojson, &simplify_tolerance_m).to_string())
+fn smooth_and_simplify_polygon_fc(
+    geojson: &str,
+    smoothing_iterations: usize,
+    simplify_tolerance_m: f64,
+) -> PyResult<String> {
+    Ok(
+        smooth_and_simplify_polygon_fc_impl(geojson, smoothing_iterations, &simplify_tolerance_m)
+            .to_string(),
+    )
 }
 
 #[pymodule]
@@ -64,7 +77,7 @@ mod tests {
     #[test]
     fn test_smooth_and_simplify_polygon_fc() {
         let result =
-            smooth_and_simplify_polygon_fc_impl(test_data::VECTORIZED_RASTER_POLYGON_FC, &0.3)
+            smooth_and_simplify_polygon_fc_impl(test_data::VECTORIZED_RASTER_POLYGON_FC, 2, &0.3)
                 .to_string();
         assert!(result.contains("Feature"));
         assert!(result.contains("FeatureCollection"));
