@@ -1,24 +1,26 @@
-use geo::Polygon;
+use geo::{MultiPolygon, Polygon};
 use geojson::{GeoJson, Value};
 
 fn collect_polygons(geojson: &GeoJson) -> Vec<Polygon> {
     let mut v: Vec<Polygon<f64>> = Vec::new();
-    match *geojson {
-        GeoJson::FeatureCollection(ref fc) => {
-            for feat in &fc.features {
-                if let Some(ref geom) = feat.geometry {
-                    match geom.value {
-                        Value::Polygon(_) => {
-                            v.push(Polygon::try_from(geom).expect("Unable to read polygon"))
-                        }
-                        _ => (),
+    if let GeoJson::FeatureCollection(fc) = geojson {
+        for feat in &fc.features {
+            if let Some(ref geom) = feat.geometry {
+                match geom.value {
+                    Value::Polygon(_) => {
+                        v.push(Polygon::try_from(geom).expect("Unable to read Polygon"))
                     }
+                    Value::MultiPolygon(_) => v.extend(
+                        MultiPolygon::try_from(geom)
+                            .expect("Unable to read MultiPolygon")
+                            .into_iter(),
+                    ),
+                    _ => (),
                 }
             }
         }
-        _ => (),
     }
-    return v;
+    v
 }
 
 pub fn read_polygons_from_feature_collection(geojson_str: &str) -> Vec<Polygon> {

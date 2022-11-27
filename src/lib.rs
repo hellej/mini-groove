@@ -11,7 +11,7 @@ pub fn smooth_and_simplify_polygon_fc_impl(
 ) -> FeatureCollection {
     make_fc_from_polygons::make_fc_from_polygons(
         smooth_simplify_polygons::smooth_simplify_polygons(
-            read_polygons_from_fc::read_polygons_from_feature_collection(&geojson),
+            read_polygons_from_fc::read_polygons_from_feature_collection(geojson),
             simplify_tolerance_m,
         ),
     )
