@@ -24,6 +24,7 @@ mod tests {
         let result = read_polygon_from_wkt("POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))");
         assert_eq!(result.exterior().coords().count(), 5);
     }
+
     #[test]
     fn test_read_polygons_from_wkts() {
         let wkts: Vec<&str> = [
