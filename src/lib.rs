@@ -1,5 +1,6 @@
 use geojson::FeatureCollection;
 use pyo3::prelude::*;
+use rayon::prelude::*;
 use wkt::ToWkt;
 
 mod make_fc_from_polygons;
@@ -17,7 +18,7 @@ fn smooth_and_simplify_polygons_from_wkts_impl(
         smoothing_iterations,
         simplify_tolerance_m,
     )
-    .iter()
+    .par_iter()
     .map(|p| p.wkt_string())
     .collect()
 }

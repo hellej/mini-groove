@@ -1,6 +1,6 @@
-use std::str::FromStr;
-
 use geo::Polygon;
+use rayon::prelude::*;
+use std::str::FromStr;
 use wkt::Wkt;
 
 fn read_polygon_from_wkt(wkt_str: &str) -> Polygon {
@@ -10,7 +10,7 @@ fn read_polygon_from_wkt(wkt_str: &str) -> Polygon {
 
 pub fn read_polygons_from_wkts(polygon_wkts: &[&str]) -> Vec<Polygon> {
     polygon_wkts
-        .iter()
+        .par_iter()
         .map(|p| read_polygon_from_wkt(p))
         .collect::<Vec<Polygon>>()
 }
